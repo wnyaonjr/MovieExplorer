@@ -10,5 +10,6 @@ interface MovieService {
     suspend fun getMovies(
         @Query("term") term: String,
         @Query("country") country: String,
+        @Query("media") media: String,
     ): MovieListResponse
 }

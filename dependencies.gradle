@@ -24,7 +24,6 @@ ext {
     moshiConverterVersion = '2.4.0'
     okHttpLoggingInterceptorVersion = '4.7.2'
     okHttpVersion = '4.9.1'
-    retrofitConverterScalarVersion = '2.1.0'
 
     landscapistGlideVersion = '2.0.0'
     glideVersion = '4.11.0'

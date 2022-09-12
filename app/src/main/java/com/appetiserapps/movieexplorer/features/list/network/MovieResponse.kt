@@ -13,9 +13,9 @@ data class MovieResponse(
     @Json(name = "trackPrice")
     val trackPrice: Double,
     @Json(name = "shortDescription")
-    val shortDescription: String,
+    val shortDescription: String?,
     @Json(name = "longDescription")
-    val longDescription: String,
+    val longDescription: String?,
     @Json(name = "primaryGenreName")
     val primaryGenreName: String
 )

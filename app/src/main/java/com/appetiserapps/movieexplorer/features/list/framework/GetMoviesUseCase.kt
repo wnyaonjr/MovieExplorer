@@ -7,14 +7,19 @@ import javax.inject.Inject
 
 class GetMoviesUseCase @Inject constructor(private val movieRepository: MovieRepository) :
     FlowRequestHandler by DefaultFlowRequestHandler {
-    operator fun invoke(term: String, country: String = DEFAULT_COUNTRY) = safeApiCall {
+    operator fun invoke(
+        term: String,
+        country: String = DEFAULT_COUNTRY
+    ) = safeApiCall {
         movieRepository.getMovies(
             term = term,
-            country = country
+            country = country,
+            media = DEFAULT_MEDIA
         )
     }
 
     companion object {
         private const val DEFAULT_COUNTRY = "au"
+        private const val DEFAULT_MEDIA = "movie"
     }
 }
