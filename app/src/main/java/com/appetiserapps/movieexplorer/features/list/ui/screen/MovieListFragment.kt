@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.appetiserapps.movieexplorer.databinding.FragmentMovieListBinding
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MovieListFragment : Fragment() {
@@ -27,5 +28,12 @@ class MovieListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
+        initObservers()
+    }
+
+    private fun initObservers() {
+        viewModel.movies.observe(viewLifecycleOwner) {
+            Timber.d("Local Movies --> ${it.count()}")
+        }
     }
 }

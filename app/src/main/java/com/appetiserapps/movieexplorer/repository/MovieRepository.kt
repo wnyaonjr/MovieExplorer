@@ -1,20 +1,51 @@
 package com.appetiserapps.movieexplorer.repository
 
+import com.appetiserapps.movieexplorer.features.list.domain.Movie
 import com.appetiserapps.movieexplorer.features.list.network.MovieListResponse
+import com.appetiserapps.movieexplorer.features.list.network.MovieResponse
 import com.appetiserapps.movieexplorer.features.list.service.MovieService
+import com.appetiserapps.movieexplorer.local.db.Database
+import com.appetiserapps.movieexplorer.local.db.entity.toDomainModel
+import com.appetiserapps.movieexplorer.local.db.entity.toEntityModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 interface MovieRepository {
     suspend fun getMovies(term: String, country: String, media: String): MovieListResponse
+    suspend fun saveMovies(movies: List<MovieResponse>)
+    fun getMovies(trackName: String?): Flow<List<Movie>>
+    fun getMovieCount(): Flow<Int>
 }
 
 class MovieRepositoryImpl(
-    private val movieService: MovieService
+    private val movieService: MovieService,
+    private val database: Database
 ) : MovieRepository {
+
+    private val movieDao by lazy {
+        database.movieDao()
+    }
+
+
     override suspend fun getMovies(term: String, country: String, media: String) =
         movieService.getMovies(
             term = term,
             country = country,
             media = media
         )
+
+    override fun getMovies(trackName: String?) = movieDao.getAll(trackName).map {
+        it.toDomainModel()
+    }
+
+    override suspend fun saveMovies(movies: List<MovieResponse>) {
+        withContext(Dispatchers.IO) {
+            movieDao.insertAll(*movies.toEntityModel().toTypedArray())
+        }
+    }
+
+    override fun getMovieCount() = movieDao.getRowCount()
 
 }

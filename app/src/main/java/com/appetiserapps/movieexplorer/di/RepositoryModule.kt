@@ -1,6 +1,7 @@
 package com.appetiserapps.movieexplorer.di
 
 import com.appetiserapps.movieexplorer.features.list.service.MovieService
+import com.appetiserapps.movieexplorer.local.db.Database
 import com.appetiserapps.movieexplorer.repository.MovieRepository
 import com.appetiserapps.movieexplorer.repository.MovieRepositoryImpl
 import dagger.Module
@@ -14,8 +15,10 @@ object RepositoryModule {
 
     @Provides
     fun provideMovieRepository(
-        movieService: MovieService
+        movieService: MovieService,
+        database: Database
     ): MovieRepository = MovieRepositoryImpl(
-        movieService = movieService
+        movieService = movieService,
+        database = database
     )
 }

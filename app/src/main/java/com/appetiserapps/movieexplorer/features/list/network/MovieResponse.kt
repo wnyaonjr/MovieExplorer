@@ -8,6 +8,8 @@ import com.squareup.moshi.JsonClass
 data class MovieResponse(
     @Json(name = "trackId")
     val trackId: Int,
+    @Json(name = "trackName")
+    val trackName: String,
     @Json(name = "artworkUrl100")
     val artworkUrl100: String,
     @Json(name = "trackPrice")
