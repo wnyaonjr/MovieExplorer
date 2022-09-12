@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MovieExplorer</string>
+    <string name="price">$%s</string>
+
 </resources>

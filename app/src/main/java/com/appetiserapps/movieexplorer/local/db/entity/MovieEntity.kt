@@ -12,7 +12,6 @@ data class MovieEntity(
     val trackName: String,
     val artworkUrl100: String,
     val trackPrice: Double,
-    val shortDescription: String?,
     val longDescription: String?,
     val primaryGenreName: String,
     val favorite: Boolean = false
@@ -27,7 +26,6 @@ fun MovieResponse.toEntityModel() = MovieEntity(
     trackName = trackName,
     artworkUrl100 = artworkUrl100,
     trackPrice = trackPrice,
-    shortDescription = shortDescription,
     longDescription = longDescription,
     primaryGenreName = primaryGenreName,
 )
@@ -41,7 +39,6 @@ fun MovieEntity.toDomainModel() = Movie(
     trackName = trackName,
     artworkUrl100 = artworkUrl100,
     trackPrice = trackPrice,
-    shortDescription = shortDescription,
     longDescription = longDescription,
     primaryGenreName = primaryGenreName,
     favorite = favorite

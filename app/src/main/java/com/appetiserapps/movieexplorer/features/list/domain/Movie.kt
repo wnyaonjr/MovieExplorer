@@ -6,7 +6,6 @@ data class Movie(
     val trackName: String,
     val artworkUrl100: String,
     val trackPrice: Double,
-    val shortDescription: String?,
     val longDescription: String?,
     val primaryGenreName: String,
     val favorite: Boolean
