@@ -23,4 +23,7 @@ interface MovieDao {
 
     @Query("UPDATE table_movies SET favorite = :favorite WHERE trackId = :trackId")
     suspend fun favorite(trackId: Int, favorite: Boolean)
+
+    @Query("SELECT * FROM table_movies where trackId = :trackId")
+    suspend fun get(trackId: Int): MovieEntity
 }

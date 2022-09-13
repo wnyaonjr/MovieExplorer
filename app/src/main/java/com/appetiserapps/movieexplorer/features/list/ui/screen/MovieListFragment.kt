@@ -2,7 +2,9 @@ package com.appetiserapps.movieexplorer.features.list.ui.screen
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.appetiserapps.movieexplorer.R
 import com.appetiserapps.movieexplorer.databinding.FragmentMovieListBinding
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
@@ -54,6 +57,25 @@ class MovieListFragment : Fragment() {
             }
         }
     }.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initObservers()
+    }
+
+    private fun initObservers() {
+        viewModel.navigateToMovieDetails.observe(viewLifecycleOwner) {
+            navigateToMovieDetails(it)
+        }
+    }
+
+    private fun navigateToMovieDetails(trackId: Int) {
+        findNavController().navigate(
+            MovieListFragmentDirections.actionMovieListFragmentToMovieDetailsFragment(
+                trackId
+            )
+        )
+    }
 }
 
 @Composable
@@ -62,52 +84,68 @@ fun MovieListLayout(viewModel: MovieListViewModel) {
 
     MovieListLayout(
         movies = movies,
-        onFavoriteClick = viewModel::favorite
+        onFavoriteClickListener = viewModel::onFavoriteClick,
+        onMovieClickListener = viewModel::onMovieClick
     )
 }
 
 @Composable
 fun MovieListLayout(
     movies: List<Movie>?,
-    onFavoriteClick: ((trackId: Int, favorite: Boolean) -> Unit)? = null
+    onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)? = null,
+    onMovieClickListener: ((trackId: Int) -> Unit)? = null
 ) {
     Column(modifier = Modifier.background(colorResource(R.color.gray))) {
         MovieList(
             movies = movies,
-            onFavoriteClick = onFavoriteClick
+            onFavoriteClickListener = onFavoriteClickListener,
+            onMovieClickListener = onMovieClickListener
         )
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieList(
     movies: List<Movie>?,
-    onFavoriteClick: ((trackId: Int, favorite: Boolean) -> Unit)? = null
+    onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)? = null,
+    onMovieClickListener: ((trackId: Int) -> Unit)? = null
 ) {
     if (!movies.isNullOrEmpty()) {
         LazyColumn {
             items(movies) { movie ->
                 MovieItem(
                     movie = movie,
-                    onFavoriteClick = onFavoriteClick
+                    onFavoriteClickListener = onFavoriteClickListener,
+                    onMovieClickListener = onMovieClickListener,
+                    modifier = Modifier.animateItemPlacement()
                 )
             }
         }
     } else {
-
+        //TODO empty movie list
     }
 }
 
 @Composable
 fun MovieItem(
+    modifier: Modifier = Modifier,
     movie: Movie,
-    onFavoriteClick: ((trackId: Int, favorite: Boolean) -> Unit)? = null
+    onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)? = null,
+    onMovieClickListener: ((trackId: Int) -> Unit)? = null,
 ) {
     val interactionSource = MutableInteractionSource()
     val favoriteState = remember { mutableStateOf(true) }
     favoriteState.value = movie.favorite
 
-    Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable {
+                onMovieClickListener?.invoke(movie.trackId)
+            }
+    ) {
         Column(modifier = Modifier.padding(8.dp)) {
 
             Text(
@@ -157,7 +195,7 @@ fun MovieItem(
                             indication = null
                         ) {
                             val newState = favoriteState.value.not()
-                            onFavoriteClick?.invoke(movie.trackId, newState)
+                            onFavoriteClickListener?.invoke(movie.trackId, newState)
                             favoriteState.value = newState
                         }
                 )
@@ -175,7 +213,7 @@ fun MovieItem(
 fun MovieItemPreview() {
     MaterialTheme {
         MovieItem(
-            Movie(
+            movie = Movie(
                 trackId = 1437031362,
                 trackName = "A Star Is Born (2018)",
                 artworkUrl100 = "https://is1-ssl.mzstatic.com/image/thumb/Video115/v4/a2/26/fd/a226fd77-c80b-5ee7-e40f-6a0222e1645d/pr_source.jpg/100x100bb.jpg",

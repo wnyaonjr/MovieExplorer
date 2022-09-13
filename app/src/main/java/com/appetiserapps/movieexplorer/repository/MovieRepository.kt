@@ -18,6 +18,7 @@ interface MovieRepository {
     fun getMovies(trackName: String?): Flow<List<Movie>>
     fun getMovieCount(): Flow<Int>
     suspend fun favorite(trackId: Int, favorite: Boolean)
+    suspend fun getMovie(trackId: Int): Movie
 }
 
 class MovieRepositoryImpl(
@@ -53,5 +54,7 @@ class MovieRepositoryImpl(
             movieDao.favorite(trackId, favorite)
         }
     }
+
+    override suspend fun getMovie(trackId: Int) = movieDao.get(trackId).toDomainModel()
 
 }

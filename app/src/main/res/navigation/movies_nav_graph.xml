@@ -18,5 +18,9 @@
         android:id="@+id/movieDetailsFragment"
         android:name="com.appetiserapps.movieexplorer.features.details.ui.screen.MovieDetailsFragment"
         android:label="MovieDetailsFragment"
-        tools:layout="@layout/fragment_movie_list" />
+        tools:layout="@layout/fragment_movie_list">
+        <argument
+            android:name="trackId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

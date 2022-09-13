@@ -3,6 +3,7 @@ package com.appetiserapps.movieexplorer.features.list.ui.screen
 import androidx.lifecycle.*
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
 import com.appetiserapps.movieexplorer.features.list.framework.MovieListUseCases
+import com.appetiserapps.movieexplorer.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -18,11 +19,16 @@ class MovieListViewModel @Inject constructor(
     val trackName = MutableLiveData<String>()
     private val movieCount = movieListUseCases.getMovieCountUseCase().asLiveData()
 
-    private val _movies = MediatorLiveData<List<Movie>>()
-    val movies: LiveData<List<Movie>> = _movies
+    private val _movies = MediatorLiveData<List<Movie>?>()
+    val movies: LiveData<List<Movie>?> = _movies
+
+    private val _navigateToMovieDetails = SingleLiveEvent<Int>()
+    val navigateToMovieDetails: LiveData<Int> = _navigateToMovieDetails
+
 
     init {
         initSources()
+//        updateMovies()
     }
 
     private fun initSources() {
@@ -40,7 +46,9 @@ class MovieListViewModel @Inject constructor(
 
     private fun refreshMovieList() {
         viewModelScope.launch {
-            _movies.value = movieListUseCases.getMoviesUseCase(trackName.value).firstOrNull()
+            _movies.value = movieListUseCases.sortMoviesUseCase(
+                movies = movieListUseCases.getMoviesUseCase(trackName.value).firstOrNull()
+            )
         }
     }
 
@@ -50,10 +58,14 @@ class MovieListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun favorite(trackId: Int, favorite: Boolean) {
+    fun onFavoriteClick(trackId: Int, favorite: Boolean) {
         viewModelScope.launch {
             movieListUseCases.favoriteMovieUseCase(trackId, favorite)
         }
+    }
+
+    fun onMovieClick(trackId: Int) {
+        _navigateToMovieDetails.value = trackId
     }
 
 
