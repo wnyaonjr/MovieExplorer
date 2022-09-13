@@ -3,5 +3,6 @@
     <string name="price">$%s</string>
     <string name="genre">Genre: %s</string>
     <string name="movie_name">Movie Name</string>
+    <string name="no_movies_found">No movies found</string>
 
 </resources>

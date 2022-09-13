@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -145,7 +142,7 @@ fun MovieList(
             }
         }
     } else {
-        //TODO empty movie list
+        NoResultFoundDisplay()
     }
 }
 
@@ -244,6 +241,29 @@ fun MovieItemPreview() {
                 primaryGenreName = "Romance",
                 favorite = false
             )
+        )
+    }
+}
+
+@Composable
+fun NoResultFoundDisplay() {
+    Column(
+        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.no_movies_found),
+            modifier = Modifier.padding(top = 32.dp),
+            style = MaterialTheme.typography.subtitle1,
+            color = colorResource(R.color.black),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_video_solid),
+            contentDescription = null,
+            modifier = Modifier.size(48.dp)
         )
     }
 }
