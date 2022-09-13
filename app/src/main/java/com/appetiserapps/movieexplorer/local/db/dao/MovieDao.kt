@@ -18,6 +18,9 @@ interface MovieDao {
     @Query("DELETE from table_movies")
     fun delete()
 
+    @Query("DELETE from table_movies WHERE favorite= :favorite")
+    fun deleteMovies(favorite: Boolean = false)
+
     @Query("SELECT COUNT(trackId) FROM table_movies")
     fun getRowCount(): Flow<Int>
 

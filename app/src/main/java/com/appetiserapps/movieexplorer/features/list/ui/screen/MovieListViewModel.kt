@@ -5,10 +5,13 @@ import com.appetiserapps.movieexplorer.features.list.domain.Movie
 import com.appetiserapps.movieexplorer.features.list.framework.MovieListUseCases
 import com.appetiserapps.movieexplorer.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,10 +28,10 @@ class MovieListViewModel @Inject constructor(
     private val _navigateToMovieDetails = SingleLiveEvent<Int>()
     val navigateToMovieDetails: LiveData<Int> = _navigateToMovieDetails
 
+    private var delayedSearchJob: Job? = null
 
     init {
         initSources()
-//        updateMovies()
     }
 
     private fun initSources() {
@@ -47,15 +50,22 @@ class MovieListViewModel @Inject constructor(
     private fun refreshMovieList() {
         viewModelScope.launch {
             _movies.value = movieListUseCases.sortMoviesUseCase(
-                movies = movieListUseCases.getMoviesUseCase(trackName.value).firstOrNull()
+                movies = movieListUseCases.getMoviesUseCase(null).firstOrNull()
             )
         }
     }
 
-    fun updateMovies() {
-        movieListUseCases.updateMoviesUseCase("star").onEach {
-            //TODO display of loading, success, and error message
-        }.launchIn(viewModelScope)
+    fun onSearch(query: String) {
+        Timber.d("onSearch --> query: $query")
+        trackName.value = query
+
+        delayedSearchJob?.cancel()
+        delayedSearchJob = viewModelScope.launch {
+            delay(TEXT_CHANGE_DEBOUNCE)
+            movieListUseCases.updateMoviesUseCase(query).onEach {
+                //TODO display of loading, success, and error message
+            }.launchIn(viewModelScope)
+        }
     }
 
     fun onFavoriteClick(trackId: Int, favorite: Boolean) {
@@ -66,6 +76,10 @@ class MovieListViewModel @Inject constructor(
 
     fun onMovieClick(trackId: Int) {
         _navigateToMovieDetails.value = trackId
+    }
+
+    companion object {
+        private const val TEXT_CHANGE_DEBOUNCE = 1000L
     }
 
 

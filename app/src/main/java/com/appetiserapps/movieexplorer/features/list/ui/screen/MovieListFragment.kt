@@ -12,20 +12,20 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -81,21 +81,43 @@ class MovieListFragment : Fragment() {
 @Composable
 fun MovieListLayout(viewModel: MovieListViewModel) {
     val movies by viewModel.movies.observeAsState()
+    val trackName by viewModel.trackName.observeAsState()
 
     MovieListLayout(
         movies = movies,
+        trackName = trackName,
         onFavoriteClickListener = viewModel::onFavoriteClick,
-        onMovieClickListener = viewModel::onMovieClick
+        onMovieClickListener = viewModel::onMovieClick,
+        searchListener = viewModel::onSearch
     )
 }
 
 @Composable
 fun MovieListLayout(
     movies: List<Movie>?,
+    trackName: String?,
     onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)? = null,
-    onMovieClickListener: ((trackId: Int) -> Unit)? = null
+    onMovieClickListener: ((trackId: Int) -> Unit)? = null,
+    searchListener: ((query: String) -> Unit)? = null
 ) {
+
+    var text by remember { mutableStateOf(TextFieldValue(trackName.orEmpty())) }
+
     Column(modifier = Modifier.background(colorResource(R.color.gray))) {
+        OutlinedTextField(
+            value = text,
+            singleLine = true,
+            leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            label = { Text(text = stringResource(R.string.movie_name)) },
+            onValueChange = {
+                text = it
+                searchListener?.invoke(text.text)
+            }
+        )
         MovieList(
             movies = movies,
             onFavoriteClickListener = onFavoriteClickListener,

@@ -44,6 +44,7 @@ class MovieRepositoryImpl(
 
     override suspend fun saveMovies(movies: List<MovieResponse>) {
         withContext(Dispatchers.IO) {
+            movieDao.deleteMovies()
             movieDao.insertAll(*movies.toEntityModel().toTypedArray())
         }
     }

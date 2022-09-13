@@ -2,5 +2,6 @@
     <string name="app_name">MovieExplorer</string>
     <string name="price">$%s</string>
     <string name="genre">Genre: %s</string>
+    <string name="movie_name">Movie Name</string>
 
 </resources>

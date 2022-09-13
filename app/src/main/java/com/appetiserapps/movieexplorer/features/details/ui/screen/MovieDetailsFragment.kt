@@ -3,9 +3,7 @@ package com.appetiserapps.movieexplorer.features.details.ui.screen
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
@@ -58,7 +56,10 @@ class MovieDetailsFragment : Fragment() {
 fun MovieDetailsLayout(viewModel: MovieDetailsViewModel) {
     val movie by viewModel.movie.observeAsState()
 
-    Column(modifier = Modifier.background(colorResource(R.color.gray))) {
+    Column(
+        modifier = Modifier.background(colorResource(R.color.gray))
+            .verticalScroll(rememberScrollState())
+    ) {
         MovieDetailsLayout(
             movie = movie,
             onFavoriteClickListener = viewModel::onFavoriteClick
@@ -82,7 +83,7 @@ fun MovieDetailsLayout(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
 
                 Text(
                     text = movie.trackName,
@@ -136,6 +137,8 @@ fun MovieDetailsLayout(
                             }
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = movie.longDescription.orEmpty(),

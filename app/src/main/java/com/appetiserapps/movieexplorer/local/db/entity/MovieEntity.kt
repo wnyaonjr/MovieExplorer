@@ -25,7 +25,7 @@ fun MovieResponse.toEntityModel() = MovieEntity(
     trackId = trackId,
     trackName = trackName,
     artworkUrl100 = artworkUrl100,
-    trackPrice = trackPrice,
+    trackPrice = trackPrice ?: 0.0,
     longDescription = longDescription,
     primaryGenreName = primaryGenreName,
 )
