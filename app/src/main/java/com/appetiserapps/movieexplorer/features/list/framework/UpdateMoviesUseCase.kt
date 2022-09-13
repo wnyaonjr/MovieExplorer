@@ -20,6 +20,8 @@ class UpdateMoviesUseCase @Inject constructor(private val movieRepository: Movie
         if (moviesResponse.results.isNotEmpty()) {
             movieRepository.saveMovies(moviesResponse.results)
         }
+
+        moviesResponse
     }
 
     companion object {

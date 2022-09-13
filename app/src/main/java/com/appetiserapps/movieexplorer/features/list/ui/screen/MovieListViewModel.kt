@@ -3,6 +3,8 @@ package com.appetiserapps.movieexplorer.features.list.ui.screen
 import androidx.lifecycle.*
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
 import com.appetiserapps.movieexplorer.features.list.framework.MovieListUseCases
+import com.appetiserapps.movieexplorer.features.list.network.MovieListResponse
+import com.appetiserapps.movieexplorer.network.ResultWrapper
 import com.appetiserapps.movieexplorer.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -11,7 +13,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,8 +31,11 @@ class MovieListViewModel @Inject constructor(
 
     private var delayedSearchJob: Job? = null
 
+    private val movieSearchResults = MutableLiveData<List<Int>>()
+
     init {
         initSources()
+        refreshMovieList()
     }
 
     private fun initSources() {
@@ -45,27 +49,46 @@ class MovieListViewModel @Inject constructor(
         _movies.addSource(movieCount) {
             refreshMovieList()
         }
+        _movies.addSource(movieSearchResults) {
+            refreshMovieList()
+        }
     }
 
     private fun refreshMovieList() {
         viewModelScope.launch {
+
+            val moviesList = movieSearchResults.value
+
             _movies.value = movieListUseCases.sortMoviesUseCase(
                 movies = movieListUseCases.getMoviesUseCase(null).firstOrNull()
+                    ?.filter { moviesList?.contains(it.trackId) ?: it.favorite }
             )
         }
     }
 
     fun onSearch(query: String) {
-        Timber.d("onSearch --> query: $query")
         trackName.value = query
 
         delayedSearchJob?.cancel()
-        delayedSearchJob = viewModelScope.launch {
-            delay(TEXT_CHANGE_DEBOUNCE)
-            movieListUseCases.updateMoviesUseCase(query).onEach {
-                //TODO display of loading, success, and error message
-            }.launchIn(viewModelScope)
+
+        if (query.isNotBlank()) {
+            delayedSearchJob = viewModelScope.launch {
+                delay(TEXT_CHANGE_DEBOUNCE)
+                movieListUseCases.updateMoviesUseCase(query).onEach { wrapper ->
+                    //TODO display of loading, success, and error message
+
+                    if (wrapper is ResultWrapper.Success) {
+                        handleSuccessUpdateMovies(wrapper.value)
+                    }
+                }.launchIn(viewModelScope)
+            }
+        } else {
+            movieSearchResults.value = null
         }
+    }
+
+    private fun handleSuccessUpdateMovies(response: MovieListResponse) {
+        movieSearchResults.value = response.results.map { it.trackId }
     }
 
     fun onFavoriteClick(trackId: Int, favorite: Boolean) {
