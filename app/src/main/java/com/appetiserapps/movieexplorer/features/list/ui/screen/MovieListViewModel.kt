@@ -23,9 +23,6 @@ class MovieListViewModel @Inject constructor(
 
     init {
         initSources()
-
-        trackName.value = "star"
-        updateMovies()
     }
 
     private fun initSources() {
