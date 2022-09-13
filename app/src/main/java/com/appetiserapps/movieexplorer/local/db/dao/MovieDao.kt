@@ -20,4 +20,7 @@ interface MovieDao {
 
     @Query("SELECT COUNT(trackId) FROM table_movies")
     fun getRowCount(): Flow<Int>
+
+    @Query("UPDATE table_movies SET favorite = :favorite WHERE trackId = :trackId")
+    suspend fun favorite(trackId: Int, favorite: Boolean)
 }

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -58,25 +61,36 @@ fun MovieListLayout(viewModel: MovieListViewModel) {
     val movies by viewModel.movies.observeAsState()
 
     MovieListLayout(
-        movies = movies
+        movies = movies,
+        onFavoriteClick = viewModel::favorite
     )
 }
 
 @Composable
-fun MovieListLayout(movies: List<Movie>?) {
+fun MovieListLayout(
+    movies: List<Movie>?,
+    onFavoriteClick: ((trackId: Int, favorite: Boolean) -> Unit)? = null
+) {
     Column(modifier = Modifier.background(colorResource(R.color.gray))) {
         MovieList(
-            movies = movies
+            movies = movies,
+            onFavoriteClick = onFavoriteClick
         )
     }
 }
 
 @Composable
-fun MovieList(movies: List<Movie>?) {
+fun MovieList(
+    movies: List<Movie>?,
+    onFavoriteClick: ((trackId: Int, favorite: Boolean) -> Unit)? = null
+) {
     if (!movies.isNullOrEmpty()) {
         LazyColumn {
             items(movies) { movie ->
-                MovieItem(movie)
+                MovieItem(
+                    movie = movie,
+                    onFavoriteClick = onFavoriteClick
+                )
             }
         }
     } else {
@@ -85,7 +99,14 @@ fun MovieList(movies: List<Movie>?) {
 }
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(
+    movie: Movie,
+    onFavoriteClick: ((trackId: Int, favorite: Boolean) -> Unit)? = null
+) {
+    val interactionSource = MutableInteractionSource()
+    val favoriteState = remember { mutableStateOf(true) }
+    favoriteState.value = movie.favorite
+
     Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
         Column(modifier = Modifier.padding(8.dp)) {
 
@@ -121,7 +142,7 @@ fun MovieItem(movie: Movie) {
 
                 Image(
                     painter = painterResource(
-                        id = if (movie.favorite) {
+                        id = if (favoriteState.value) {
                             R.drawable.ic_heart_solid
                         } else {
                             R.drawable.ic_heart_regular
@@ -131,8 +152,13 @@ fun MovieItem(movie: Movie) {
                     modifier = Modifier.padding(end = 8.dp)
                         .width(24.dp)
                         .height(24.dp)
-                        .clickable {
-
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) {
+                            val newState = favoriteState.value.not()
+                            onFavoriteClick?.invoke(movie.trackId, newState)
+                            favoriteState.value = newState
                         }
                 )
 

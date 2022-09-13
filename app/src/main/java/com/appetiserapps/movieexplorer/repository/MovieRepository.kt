@@ -17,6 +17,7 @@ interface MovieRepository {
     suspend fun saveMovies(movies: List<MovieResponse>)
     fun getMovies(trackName: String?): Flow<List<Movie>>
     fun getMovieCount(): Flow<Int>
+    suspend fun favorite(trackId: Int, favorite: Boolean)
 }
 
 class MovieRepositoryImpl(
@@ -47,5 +48,10 @@ class MovieRepositoryImpl(
     }
 
     override fun getMovieCount() = movieDao.getRowCount()
+    override suspend fun favorite(trackId: Int, favorite: Boolean) {
+        withContext(Dispatchers.IO) {
+            movieDao.favorite(trackId, favorite)
+        }
+    }
 
 }

@@ -8,5 +8,5 @@ data class Movie(
     val trackPrice: Double,
     val longDescription: String?,
     val primaryGenreName: String,
-    val favorite: Boolean
+    var favorite: Boolean
 )

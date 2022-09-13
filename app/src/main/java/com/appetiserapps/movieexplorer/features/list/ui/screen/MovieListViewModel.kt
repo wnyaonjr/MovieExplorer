@@ -50,5 +50,11 @@ class MovieListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun favorite(trackId: Int, favorite: Boolean) {
+        viewModelScope.launch {
+            movieListUseCases.favoriteMovieUseCase(trackId, favorite)
+        }
+    }
+
 
 }
