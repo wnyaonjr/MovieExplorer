@@ -2,6 +2,7 @@ package com.appetiserapps.movieexplorer.features.list.ui.screen
 
 import androidx.lifecycle.*
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
+import com.appetiserapps.movieexplorer.features.list.domain.MovieListState
 import com.appetiserapps.movieexplorer.features.list.framework.MovieListUseCases
 import com.appetiserapps.movieexplorer.features.list.network.MovieListResponse
 import com.appetiserapps.movieexplorer.network.ResultWrapper
@@ -33,6 +34,9 @@ class MovieListViewModel @Inject constructor(
     private var searchJob: Job? = null
 
     private val movieSearchResults = MutableLiveData<List<Int>?>()
+
+    private val _currentState = MutableLiveData(MovieListState.DEFAULT)
+    val currentState: LiveData<MovieListState> = _currentState
 
     init {
         initSources()
@@ -78,6 +82,7 @@ class MovieListViewModel @Inject constructor(
                 onSearch(query)
             }
         } else {
+            _currentState.value = MovieListState.DEFAULT
             movieSearchResults.value = null
         }
     }
@@ -89,12 +94,19 @@ class MovieListViewModel @Inject constructor(
 
     private fun onSearch(query: String) {
         searchJob = movieListUseCases.updateMoviesUseCase(query).onEach { wrapper ->
-            //TODO display of loading, success, and error message
-
             if (wrapper is ResultWrapper.Success) {
                 handleSuccessUpdateMovies(wrapper.value)
             }
+            handleResult(wrapper)
         }.launchIn(viewModelScope)
+    }
+
+    private fun handleResult(wrapper: ResultWrapper<*>) {
+        _currentState.value = when (wrapper) {
+            is ResultWrapper.Error -> MovieListState.ERROR
+            is ResultWrapper.Loading -> MovieListState.LOADING
+            is ResultWrapper.Success -> MovieListState.DEFAULT
+        }
     }
 
     private fun handleSuccessUpdateMovies(response: MovieListResponse) {
@@ -111,9 +123,15 @@ class MovieListViewModel @Inject constructor(
         _navigateToMovieDetails.value = trackId
     }
 
+    fun onRefresh() {
+        val currentSearch = trackName.value
+        if (!currentSearch.isNullOrBlank()) {
+            cancelOngoingJobs()
+            onSearch(currentSearch)
+        }
+    }
+
     companion object {
         private const val TEXT_CHANGE_DEBOUNCE = 1000L
     }
-
-
 }

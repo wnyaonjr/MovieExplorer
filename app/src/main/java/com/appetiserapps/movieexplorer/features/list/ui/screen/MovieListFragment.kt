@@ -33,6 +33,11 @@ import androidx.navigation.fragment.findNavController
 import com.appetiserapps.movieexplorer.R
 import com.appetiserapps.movieexplorer.databinding.FragmentMovieListBinding
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
+import com.appetiserapps.movieexplorer.features.list.domain.MovieListEventListeners
+import com.appetiserapps.movieexplorer.features.list.domain.MovieListState
+import com.appetiserapps.movieexplorer.features.list.domain.MovieListStates
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,26 +86,30 @@ class MovieListFragment : Fragment() {
 fun MovieListLayout(viewModel: MovieListViewModel) {
     val movies by viewModel.movies.observeAsState()
     val trackName by viewModel.trackName.observeAsState()
+    val currentState by viewModel.currentState.observeAsState()
 
     MovieListLayout(
-        movies = movies,
-        trackName = trackName,
-        onFavoriteClickListener = viewModel::onFavoriteClick,
-        onMovieClickListener = viewModel::onMovieClick,
-        searchListener = viewModel::onTextChange
+        movieListStates = MovieListStates(
+            movies = movies,
+            trackName = trackName,
+            currentState = currentState
+        ),
+        movieListEventListeners = MovieListEventListeners(
+            onFavoriteClickListener = viewModel::onFavoriteClick,
+            onMovieClickListener = viewModel::onMovieClick,
+            searchListener = viewModel::onTextChange,
+            onRefresh = viewModel::onRefresh,
+        )
     )
 }
 
 @Composable
 fun MovieListLayout(
-    movies: List<Movie>?,
-    trackName: String?,
-    onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)? = null,
-    onMovieClickListener: ((trackId: Int) -> Unit)? = null,
-    searchListener: ((query: String) -> Unit)? = null
+    movieListStates: MovieListStates,
+    movieListEventListeners: MovieListEventListeners? = null
 ) {
 
-    var text by remember { mutableStateOf(TextFieldValue(trackName.orEmpty())) }
+    var text by remember { mutableStateOf(TextFieldValue(movieListStates.trackName.orEmpty())) }
 
     Column(modifier = Modifier.background(colorResource(R.color.gray))) {
         TopAppBar(
@@ -125,7 +134,7 @@ fun MovieListLayout(
             placeholder = { Text(text = stringResource(R.string.movie_name)) },
             onValueChange = {
                 text = it
-                searchListener?.invoke(text.text)
+                movieListEventListeners?.searchListener?.invoke(text.text)
             },
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
@@ -134,9 +143,8 @@ fun MovieListLayout(
             ),
         )
         MovieList(
-            movies = movies,
-            onFavoriteClickListener = onFavoriteClickListener,
-            onMovieClickListener = onMovieClickListener
+            movieListStates = movieListStates,
+            movieListEventListeners = movieListEventListeners
         )
     }
 }
@@ -144,24 +152,39 @@ fun MovieListLayout(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieList(
-    movies: List<Movie>?,
-    onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)? = null,
-    onMovieClickListener: ((trackId: Int) -> Unit)? = null
+    movieListStates: MovieListStates,
+    movieListEventListeners: MovieListEventListeners? = null
 ) {
-    if (!movies.isNullOrEmpty()) {
-        LazyColumn {
-            items(movies) { movie ->
-                MovieItem(
-                    movie = movie,
-                    onFavoriteClickListener = onFavoriteClickListener,
-                    onMovieClickListener = onMovieClickListener,
-                    modifier = Modifier.animateItemPlacement()
-                )
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(
+            isRefreshing = movieListStates.currentState == MovieListState.LOADING
+        ),
+        onRefresh = {
+            movieListEventListeners?.onRefresh?.invoke()
+        }
+    ) {
+        when (movieListStates.currentState) {
+            MovieListState.ERROR -> ErrorDisplay()
+            else -> {
+                if (!movieListStates.movies.isNullOrEmpty()) {
+                    LazyColumn {
+                        items(movieListStates.movies) { movie ->
+                            MovieItem(
+                                movie = movie,
+                                onFavoriteClickListener = movieListEventListeners?.onFavoriteClickListener,
+                                onMovieClickListener = movieListEventListeners?.onMovieClickListener,
+                                modifier = Modifier.animateItemPlacement()
+                            )
+                        }
+                    }
+                } else {
+                    NoResultFoundDisplay()
+                }
             }
         }
-    } else {
-        NoResultFoundDisplay()
     }
+
 }
 
 @Composable
@@ -245,24 +268,6 @@ fun MovieItem(
 
 }
 
-@Preview
-@Composable
-fun MovieItemPreview() {
-    MaterialTheme {
-        MovieItem(
-            movie = Movie(
-                trackId = 1437031362,
-                trackName = "A Star Is Born (2018)",
-                artworkUrl100 = "https://is1-ssl.mzstatic.com/image/thumb/Video115/v4/a2/26/fd/a226fd77-c80b-5ee7-e40f-6a0222e1645d/pr_source.jpg/100x100bb.jpg",
-                trackPrice = 14.99,
-                longDescription = "Seasoned musician Jackson Maine (Bradley Cooper) discovers—and falls in love with—struggling artist Ally (Lady Gaga). She has just about given up on her dream to make it big as a singer… until Jack coaxes her into the spotlight. But even as Ally’s career takes off, the personal side of their relationship is breaking down, as Jack fights an ongoing battle with his own internal demons.",
-                primaryGenreName = "Romance",
-                favorite = false
-            )
-        )
-    }
-}
-
 @Composable
 fun NoResultFoundDisplay() {
     Column(
@@ -282,6 +287,48 @@ fun NoResultFoundDisplay() {
             painter = painterResource(id = R.drawable.ic_video_solid),
             contentDescription = null,
             modifier = Modifier.size(48.dp)
+        )
+    }
+}
+
+@Composable
+fun ErrorDisplay() {
+    Column(
+        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.request_error),
+            modifier = Modifier.padding(top = 32.dp),
+            style = MaterialTheme.typography.subtitle1,
+            color = colorResource(R.color.black),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_warning),
+            contentDescription = null,
+            modifier = Modifier.size(48.dp)
+        )
+    }
+}
+
+
+@Preview
+@Composable
+fun MovieItemPreview() {
+    MaterialTheme {
+        MovieItem(
+            movie = Movie(
+                trackId = 1437031362,
+                trackName = "A Star Is Born (2018)",
+                artworkUrl100 = "https://is1-ssl.mzstatic.com/image/thumb/Video115/v4/a2/26/fd/a226fd77-c80b-5ee7-e40f-6a0222e1645d/pr_source.jpg/100x100bb.jpg",
+                trackPrice = 14.99,
+                longDescription = "Seasoned musician Jackson Maine (Bradley Cooper) discovers—and falls in love with—struggling artist Ally (Lady Gaga). She has just about given up on her dream to make it big as a singer… until Jack coaxes her into the spotlight. But even as Ally’s career takes off, the personal side of their relationship is breaking down, as Jack fights an ongoing battle with his own internal demons.",
+                primaryGenreName = "Romance",
+                favorite = false
+            )
         )
     }
 }
