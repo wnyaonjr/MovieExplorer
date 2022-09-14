@@ -62,11 +62,9 @@ class MovieListViewModel @Inject constructor(
     private fun refreshMovieList() {
         viewModelScope.launch {
 
-            val moviesList = movieSearchResults.value
-
-            _movies.value = movieListUseCases.sortMoviesUseCase(
-                movies = movieListUseCases.getMoviesUseCase(null).firstOrNull()
-                    ?.filter { moviesList?.contains(it.trackId) ?: it.favorite }
+            _movies.value = movieListUseCases.displayMoviesUseCase(
+                localMovies = movieListUseCases.getMoviesUseCase(null).firstOrNull(),
+                remoteMovies = movieSearchResults.value
             )
         }
     }
