@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -109,44 +111,56 @@ fun MovieListLayout(
     movieListEventListeners: MovieListEventListeners? = null
 ) {
 
-    var text by remember { mutableStateOf(TextFieldValue(movieListStates.trackName.orEmpty())) }
 
     Column(modifier = Modifier.background(colorResource(R.color.gray))) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.movies),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Start
-                )
-            },
-            backgroundColor = Color.White,
-        )
-
-        OutlinedTextField(
-            value = text,
-            singleLine = true,
-            leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            placeholder = { Text(text = stringResource(R.string.movie_name)) },
-            onValueChange = {
-                text = it
-                movieListEventListeners?.searchListener?.invoke(text.text)
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
-                focusedIndicatorColor = colorResource(R.color.green),
-                unfocusedIndicatorColor = Color.Black
-            ),
-        )
+        HeaderLayout(R.string.movies)
+        MovieSearchLayout(movieListStates, movieListEventListeners)
         MovieList(
             movieListStates = movieListStates,
             movieListEventListeners = movieListEventListeners
         )
     }
+}
+
+@Composable
+fun MovieSearchLayout(
+    movieListStates: MovieListStates,
+    movieListEventListeners: MovieListEventListeners?
+) {
+    var text by remember { mutableStateOf(TextFieldValue(movieListStates.trackName.orEmpty())) }
+    OutlinedTextField(
+        value = text,
+        singleLine = true,
+        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        placeholder = { Text(text = stringResource(R.string.movie_name)) },
+        onValueChange = {
+            text = it
+            movieListEventListeners?.searchListener?.invoke(text.text)
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.White,
+            focusedIndicatorColor = colorResource(R.color.green),
+            unfocusedIndicatorColor = Color.Black
+        ),
+    )
+}
+
+@Composable
+fun HeaderLayout(@StringRes stringId: Int) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(stringId),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+        },
+        backgroundColor = Color.White,
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -207,109 +221,113 @@ fun MovieItem(
             }
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
+            MovieInitialDetails(
+                movie,
+                favoriteState,
+                interactionSource,
+                onFavoriteClickListener
+            )
+        }
+    }
+}
 
+@Composable
+fun MovieInitialDetails(
+    movie: Movie,
+    favoriteState: MutableState<Boolean>,
+    interactionSource: MutableInteractionSource,
+    onFavoriteClickListener: ((trackId: Int, favorite: Boolean) -> Unit)?
+) {
+    Text(
+        text = movie.trackName,
+        style = MaterialTheme.typography.h6,
+    )
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        GlideImage(
+            modifier = Modifier.size(48.dp),
+            imageModel = movie.artworkUrl100,
+            imageOptions = ImageOptions(
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.Center
+            )
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Column(modifier = Modifier.weight(1f, fill = true)) {
             Text(
-                text = movie.trackName,
-                style = MaterialTheme.typography.h6,
+                text = stringResource(R.string.genre, movie.primaryGenreName),
+                style = MaterialTheme.typography.subtitle1,
+            )
+            Text(
+                text = stringResource(R.string.price, movie.trackPrice.toString()),
+                style = MaterialTheme.typography.subtitle1,
             )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                GlideImage(
-                    modifier = Modifier.size(48.dp),
-                    imageModel = movie.artworkUrl100,
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Crop,
-                        alignment = Alignment.Center
-                    )
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Column(modifier = Modifier.weight(1f, fill = true)) {
-                    Text(
-                        text = stringResource(R.string.genre, movie.primaryGenreName),
-                        style = MaterialTheme.typography.subtitle1,
-                    )
-                    Text(
-                        text = stringResource(R.string.price, movie.trackPrice.toString()),
-                        style = MaterialTheme.typography.subtitle1,
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                Image(
-                    painter = painterResource(
-                        id = if (favoriteState.value) {
-                            R.drawable.ic_heart_solid
-                        } else {
-                            R.drawable.ic_heart_regular
-                        }
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
-                        .width(24.dp)
-                        .height(24.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null
-                        ) {
-                            val newState = favoriteState.value.not()
-                            onFavoriteClickListener?.invoke(movie.trackId, newState)
-                            favoriteState.value = newState
-                        }
-                )
-
-            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
+        Image(
+            painter = painterResource(
+                id = if (favoriteState.value) {
+                    R.drawable.ic_heart_solid
+                } else {
+                    R.drawable.ic_heart_regular
+                }
+            ),
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp)
+                .width(24.dp)
+                .height(24.dp)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+                    val newState = favoriteState.value.not()
+                    onFavoriteClickListener?.invoke(movie.trackId, newState)
+                    favoriteState.value = newState
+                }
+        )
     }
-
-
 }
 
 @Composable
 fun NoResultFoundDisplay() {
-    Column(
-        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(R.string.no_movies_found),
-            modifier = Modifier.padding(top = 32.dp),
-            style = MaterialTheme.typography.subtitle1,
-            color = colorResource(R.color.black),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Image(
-            painter = painterResource(id = R.drawable.ic_video_solid),
-            contentDescription = null,
-            modifier = Modifier.size(48.dp)
-        )
-    }
+    MessageDisplay(
+        stringId = R.string.no_movies_found,
+        drawableId = R.drawable.ic_video_solid
+    )
 }
 
 @Composable
 fun ErrorDisplay() {
+    MessageDisplay(
+        stringId = R.string.request_error,
+        drawableId = R.drawable.ic_warning
+    )
+}
+
+@Composable
+fun MessageDisplay(@StringRes stringId: Int, @DrawableRes drawableId: Int) {
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(R.string.request_error),
-            modifier = Modifier.padding(top = 32.dp),
-            style = MaterialTheme.typography.subtitle1,
-            color = colorResource(R.color.black),
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Image(
+            painter = painterResource(id = drawableId),
+            contentDescription = null,
+            modifier = Modifier.size(48.dp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Image(
-            painter = painterResource(id = R.drawable.ic_warning),
-            contentDescription = null,
-            modifier = Modifier.size(48.dp)
+        Text(
+            text = stringResource(stringId),
+            style = MaterialTheme.typography.subtitle1,
+            color = colorResource(R.color.black),
         )
     }
 }
