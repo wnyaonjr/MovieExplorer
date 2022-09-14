@@ -4,6 +4,9 @@ import androidx.multidex.MultiDexApplication
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
+/**
+ * Application definition, contains starting of logger when build type is debug
+ */
 @HiltAndroidApp
 class MovieExplorerApp : MultiDexApplication() {
 

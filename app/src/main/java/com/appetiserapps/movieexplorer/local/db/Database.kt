@@ -5,6 +5,9 @@ import androidx.room.RoomDatabase
 import com.appetiserapps.movieexplorer.local.db.dao.MovieDao
 import com.appetiserapps.movieexplorer.local.db.entity.MovieEntity
 
+/**
+ * Database definition which contains movie entity and dao
+ */
 @Database(
     entities = [
         MovieEntity::class

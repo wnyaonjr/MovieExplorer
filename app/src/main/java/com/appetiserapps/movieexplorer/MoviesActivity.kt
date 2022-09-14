@@ -6,6 +6,9 @@ import androidx.databinding.DataBindingUtil
 import com.appetiserapps.movieexplorer.databinding.ActivityMoviesBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Parent container of the movie views
+ */
 @AndroidEntryPoint
 class MoviesActivity : AppCompatActivity() {
 

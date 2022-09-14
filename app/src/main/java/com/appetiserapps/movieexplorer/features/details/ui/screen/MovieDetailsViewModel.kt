@@ -7,6 +7,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Contains the main functions supported by movie details screen such as getting movie details, and setting movie as favorite
+ */
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     private val movieDetailsUseCases: MovieDetailsUseCases,

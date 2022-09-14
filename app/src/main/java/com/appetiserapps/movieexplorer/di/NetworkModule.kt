@@ -14,6 +14,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
+/**
+ * Definition of dependencies related to network requests
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {

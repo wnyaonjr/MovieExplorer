@@ -4,6 +4,9 @@ package com.appetiserapps.movieexplorer.features.list.network
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+/**
+ * Class representation of expected JSON response for movie details
+ */
 @JsonClass(generateAdapter = true)
 data class MovieResponse(
     @Json(name = "trackId")

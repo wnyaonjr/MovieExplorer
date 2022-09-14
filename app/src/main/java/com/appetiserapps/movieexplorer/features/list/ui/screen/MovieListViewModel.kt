@@ -16,6 +16,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Contains the main functions supported by movie list screen such as getting favorite movies, search movies from API, refresh list,
+ * show error, and setting movie as favorite
+ */
 @HiltViewModel
 class MovieListViewModel @Inject constructor(
     private val movieListUseCases: MovieListUseCases

@@ -5,6 +5,9 @@ import androidx.room.PrimaryKey
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
 import com.appetiserapps.movieexplorer.features.list.network.MovieResponse
 
+/**
+ * Class definition of movie for saving in local database
+ */
 @Entity(tableName = "table_movies")
 data class MovieEntity(
     @PrimaryKey

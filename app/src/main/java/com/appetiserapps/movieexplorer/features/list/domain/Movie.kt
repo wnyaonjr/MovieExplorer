@@ -1,6 +1,8 @@
 package com.appetiserapps.movieexplorer.features.list.domain
 
-
+/**
+ * Class for holding movie information for view layer usage
+ */
 data class Movie(
     val trackId: Int,
     val trackName: String,

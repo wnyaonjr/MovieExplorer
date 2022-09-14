@@ -5,6 +5,9 @@ import com.appetiserapps.movieexplorer.repository.handler.DefaultFlowRequestHand
 import com.appetiserapps.movieexplorer.repository.handler.FlowRequestHandler
 import javax.inject.Inject
 
+/**
+ * Use case to request movies based on search parameter and saving it to local database
+ */
 class UpdateMoviesUseCase @Inject constructor(private val movieRepository: MovieRepository) :
     FlowRequestHandler by DefaultFlowRequestHandler {
     operator fun invoke(

@@ -43,6 +43,9 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Contains the layout for the movie list
+ */
 @AndroidEntryPoint
 class MovieListFragment : Fragment() {
 

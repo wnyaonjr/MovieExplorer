@@ -9,6 +9,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+/**
+ * Definition of repository dependency for network requests and local database operation
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {

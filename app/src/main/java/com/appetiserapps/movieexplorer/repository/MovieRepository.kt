@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
+/**
+ * Definition of functions supported for remote and local data handling
+ */
 interface MovieRepository {
     suspend fun getMovies(term: String, country: String, media: String): MovieListResponse
     suspend fun saveMovies(movies: List<MovieResponse>)

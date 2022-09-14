@@ -29,6 +29,9 @@ import com.appetiserapps.movieexplorer.features.list.ui.screen.HeaderLayout
 import com.appetiserapps.movieexplorer.features.list.ui.screen.MovieInitialDetails
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Contains the layout for the movie details
+ */
 @AndroidEntryPoint
 class MovieDetailsFragment : Fragment() {
 

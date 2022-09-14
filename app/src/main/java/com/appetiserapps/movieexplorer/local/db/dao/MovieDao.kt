@@ -7,6 +7,9 @@ import androidx.room.Query
 import com.appetiserapps.movieexplorer.local.db.entity.MovieEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Definition of supported functions for local movie data
+ */
 @Dao
 interface MovieDao {
     @Query("SELECT * FROM table_movies")
