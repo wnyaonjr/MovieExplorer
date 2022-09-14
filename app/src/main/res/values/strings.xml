@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MovieExplorer</string>
+    <string name="price">$%s</string>
+    <string name="genre">Genre: %s</string>
+    <string name="movie_name">Movie Name</string>
+    <string name="no_movies_found">No movies found</string>
+    <string name="movies">Movies</string>
+    <string name="movie_details">Movie Details</string>
+    <string name="request_error">Something went wrong, please try again later.</string>
+
+</resources>
