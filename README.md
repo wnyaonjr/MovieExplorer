@@ -17,4 +17,5 @@ The application uses Dependency Injection pattern along with "screaming architec
 A disadvantage for this architecture is that it oftens create more codes and need to find a way to group related use cases.
 
 ## Other information
-Jetpack compose was used for this application to showcase enthusiasm in learning new technologies related to Android. Please do note that I can still do layout using XML.
+Jetpack compose was used for this application to showcase enthusiasm in learning new technologies related to Android, I also find it useful specially in reducing boilerplate codes when creating lists.
+Please do note that I can still do layout using XML.
