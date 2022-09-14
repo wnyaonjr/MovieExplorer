@@ -90,9 +90,8 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$okHttpLoggingInterceptorVersion"
     implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
 
-    //Glide
-    implementation "com.github.skydoves:landscapist-glide:$landscapistGlideVersion"
-    implementation "com.github.bumptech.glide:glide:$glideVersion"
+    //Coil
+    implementation "io.coil-kt:coil-compose:$coilComposeVersion"
 
     // Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"

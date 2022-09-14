@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import coil.compose.AsyncImage
 import com.appetiserapps.movieexplorer.R
 import com.appetiserapps.movieexplorer.databinding.FragmentMovieListBinding
 import com.appetiserapps.movieexplorer.features.list.domain.Movie
@@ -40,8 +41,6 @@ import com.appetiserapps.movieexplorer.features.list.domain.MovieListState
 import com.appetiserapps.movieexplorer.features.list.domain.MovieListStates
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -244,13 +243,13 @@ fun MovieInitialDetails(
     )
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        GlideImage(
+
+        AsyncImage(
             modifier = Modifier.size(48.dp),
-            imageModel = movie.artworkUrl100,
-            imageOptions = ImageOptions(
-                contentScale = ContentScale.Crop,
-                alignment = Alignment.Center
-            )
+            model = movie.artworkUrl100,
+            contentDescription = null,
+            error = painterResource(R.drawable.ic_broken_image),
+            contentScale = ContentScale.Crop
         )
 
         Spacer(modifier = Modifier.width(8.dp))
