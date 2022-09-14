@@ -53,6 +53,9 @@ class MovieDetailsFragment : Fragment() {
     }.root
 }
 
+/**
+ * layout containing the movie details header and actual details
+ */
 @Composable
 fun MovieDetailsLayout(viewModel: MovieDetailsViewModel) {
     val movie by viewModel.movie.observeAsState()
@@ -69,6 +72,9 @@ fun MovieDetailsLayout(viewModel: MovieDetailsViewModel) {
     }
 }
 
+/**
+ * layout for movie details
+ */
 @Composable
 fun MovieDetailsLayout(
     movie: Movie?,
@@ -103,6 +109,9 @@ fun MovieDetailsLayout(
     }
 }
 
+/**
+ * display preview of movie details screen
+ */
 @Preview
 @Composable
 fun MovieDetailsLayoutPreview() {

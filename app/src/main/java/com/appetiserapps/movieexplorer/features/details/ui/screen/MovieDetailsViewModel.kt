@@ -28,6 +28,9 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * get movie object from local database
+     */
     private fun getMovie(trackId: Int) {
         viewModelScope.launch {
             _movie.value = movieDetailsUseCases.getMovieUseCase(trackId)
@@ -35,6 +38,9 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
 
+    /**
+     * handling when user change favorite status of movie
+     */
     fun onFavoriteClick(trackId: Int, favorite: Boolean) {
         viewModelScope.launch {
             movieDetailsUseCases.favoriteMovieUseCase(trackId, favorite)

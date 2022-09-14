@@ -71,12 +71,18 @@ class MovieListFragment : Fragment() {
         initObservers()
     }
 
+    /**
+     * contains event listeners from viewModel
+     */
     private fun initObservers() {
         viewModel.navigateToMovieDetails.observe(viewLifecycleOwner) {
             navigateToMovieDetails(it)
         }
     }
 
+    /**
+     * navigation to movie details after use click movie row
+     */
     private fun navigateToMovieDetails(trackId: Int) {
         findNavController().navigate(
             MovieListFragmentDirections.actionMovieListFragmentToMovieDetailsFragment(
@@ -86,6 +92,9 @@ class MovieListFragment : Fragment() {
     }
 }
 
+/**
+ * function overload for movie layout to declare states and event listeners from view model
+ */
 @Composable
 fun MovieListLayout(viewModel: MovieListViewModel) {
     val movies by viewModel.movies.observeAsState()
@@ -107,6 +116,9 @@ fun MovieListLayout(viewModel: MovieListViewModel) {
     )
 }
 
+/**
+ * movie list layout for header, search layout, and movie list
+ */
 @Composable
 fun MovieListLayout(
     movieListStates: MovieListStates,
@@ -124,6 +136,9 @@ fun MovieListLayout(
     }
 }
 
+/**
+ * layout for the search movie input
+ */
 @Composable
 fun MovieSearchLayout(
     movieListStates: MovieListStates,
@@ -151,6 +166,9 @@ fun MovieSearchLayout(
     )
 }
 
+/**
+ * common reusable layout for header
+ */
 @Composable
 fun HeaderLayout(@StringRes stringId: Int) {
     TopAppBar(
@@ -165,6 +183,9 @@ fun HeaderLayout(@StringRes stringId: Int) {
     )
 }
 
+/**
+ * layout of movie list based on states, includes refresh list support
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MovieList(
@@ -203,6 +224,9 @@ fun MovieList(
 
 }
 
+/**
+ * layout for movie list item, contains track name, genre, price, cover, and favorite button
+ */
 @Composable
 fun MovieItem(
     modifier: Modifier = Modifier,
@@ -233,6 +257,9 @@ fun MovieItem(
     }
 }
 
+/**
+ * common layout for movie initial details (track name, genre, price, cover
+ */
 @Composable
 fun MovieInitialDetails(
     movie: Movie,
@@ -294,6 +321,9 @@ fun MovieInitialDetails(
     }
 }
 
+/**
+ * layout when no results found from search
+ */
 @Composable
 fun NoResultFoundDisplay() {
     MessageDisplay(
@@ -302,6 +332,9 @@ fun NoResultFoundDisplay() {
     )
 }
 
+/**
+ * layout when error encountered from search
+ */
 @Composable
 fun ErrorDisplay() {
     MessageDisplay(
@@ -310,6 +343,9 @@ fun ErrorDisplay() {
     )
 }
 
+/**
+ * common layout for displaying messages when list is not available
+ */
 @Composable
 fun MessageDisplay(@StringRes stringId: Int, @DrawableRes drawableId: Int) {
     Column(
@@ -334,7 +370,9 @@ fun MessageDisplay(@StringRes stringId: Int, @DrawableRes drawableId: Int) {
     }
 }
 
-
+/**
+ * test function for showing movie row
+ */
 @Preview
 @Composable
 fun MovieItemPreview() {

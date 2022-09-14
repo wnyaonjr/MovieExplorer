@@ -15,6 +15,9 @@ class MovieExplorerApp : MultiDexApplication() {
         initLogging()
     }
 
+    /**
+     * initialize timber logging during debug build type
+     */
     private fun initLogging() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())

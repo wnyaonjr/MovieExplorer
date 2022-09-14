@@ -51,6 +51,9 @@ class MovieListViewModel @Inject constructor(
         initMovieSources()
     }
 
+    /**
+     * defines the fields to check for changes to refresh movie list
+     */
     private fun initMovieSources() {
         _movies.addSource(trackName) {
             refreshMovieList()
@@ -63,9 +66,11 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * refresh movie list from local database
+     */
     private fun refreshMovieList() {
         viewModelScope.launch {
-
             _movies.value = movieListUseCases.getDisplayMoviesUseCase(
                 localMovies = movieListUseCases.getMoviesUseCase().firstOrNull(),
                 remoteMovies = movieSearchResults.value
@@ -73,6 +78,10 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * called during user search, adds a one-second waiting time before making the network request
+     * reset states and fields when no search request to display favorite movies locally when search query is unavailable
+     */
     fun onTextChange(query: String) {
         trackName.value = query
 
@@ -89,11 +98,17 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * cancel job for searching and actual search
+     */
     private fun cancelOngoingJobs() {
         delayedSearchJob?.cancel()
         searchJob?.cancel()
     }
 
+    /**
+     * network request for searching movies
+     */
     private fun onSearch(query: String) {
         searchJob = movieListUseCases.updateMoviesUseCase(query).onEach { wrapper ->
             if (wrapper is ResultWrapper.Success) {
@@ -103,6 +118,9 @@ class MovieListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    /**
+     * change state of movie list based on network request result
+     */
     private fun handleResult(wrapper: ResultWrapper<*>) {
         _currentState.value = when (wrapper) {
             is ResultWrapper.Error -> MovieListState.ERROR
@@ -111,20 +129,32 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * save id of movie search results used in proper display of movies from local data
+     */
     private fun handleSuccessUpdateMovies(response: MovieListResponse) {
         movieSearchResults.value = response.results.map { it.trackId }
     }
 
+    /**
+     * handling when user change favorite status of movie
+     */
     fun onFavoriteClick(trackId: Int, favorite: Boolean) {
         viewModelScope.launch {
             movieListUseCases.favoriteMovieUseCase(trackId, favorite)
         }
     }
 
+    /**
+     * handling when user click a movie item from list
+     */
     fun onMovieClick(trackId: Int) {
         _navigateToMovieDetails.value = trackId
     }
 
+    /**
+     * handles pull down to refresh of list
+     */
     fun onRefresh() {
         val currentSearch = trackName.value
         if (!currentSearch.isNullOrBlank()) {
