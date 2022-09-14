@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
-    @Query("SELECT * FROM table_movies ORDER BY trackName LIKE :trackName || '%'")
-    fun getAll(trackName: String?): Flow<List<MovieEntity>>
+    @Query("SELECT * FROM table_movies")
+    fun getAll(): Flow<List<MovieEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(vararg entity: MovieEntity)

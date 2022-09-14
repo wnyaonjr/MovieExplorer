@@ -7,5 +7,5 @@ class MovieListUseCases @Inject constructor(
     val getMoviesUseCase: GetMoviesUseCase,
     val getMovieCountUseCase: GetMovieCountUseCase,
     val favoriteMovieUseCase: FavoriteMovieUseCase,
-    val displayMoviesUseCase: DisplayMoviesUseCase
+    val getDisplayMoviesUseCase: GetDisplayMoviesUseCase
 )

@@ -62,8 +62,8 @@ class MovieListViewModel @Inject constructor(
     private fun refreshMovieList() {
         viewModelScope.launch {
 
-            _movies.value = movieListUseCases.displayMoviesUseCase(
-                localMovies = movieListUseCases.getMoviesUseCase(null).firstOrNull(),
+            _movies.value = movieListUseCases.getDisplayMoviesUseCase(
+                localMovies = movieListUseCases.getMoviesUseCase().firstOrNull(),
                 remoteMovies = movieSearchResults.value
             )
         }

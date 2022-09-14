@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 interface MovieRepository {
     suspend fun getMovies(term: String, country: String, media: String): MovieListResponse
     suspend fun saveMovies(movies: List<MovieResponse>)
-    fun getMovies(trackName: String?): Flow<List<Movie>>
+    fun getMovies(): Flow<List<Movie>>
     fun getMovieCount(): Flow<Int>
     suspend fun favorite(trackId: Int, favorite: Boolean)
     suspend fun getMovie(trackId: Int): Movie
@@ -38,7 +38,7 @@ class MovieRepositoryImpl(
             media = media
         )
 
-    override fun getMovies(trackName: String?) = movieDao.getAll(trackName).map {
+    override fun getMovies() = movieDao.getAll().map {
         it.toDomainModel()
     }
 
