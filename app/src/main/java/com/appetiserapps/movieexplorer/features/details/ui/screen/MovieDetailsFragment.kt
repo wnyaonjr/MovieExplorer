@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -16,10 +17,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -60,6 +63,17 @@ fun MovieDetailsLayout(viewModel: MovieDetailsViewModel) {
         modifier = Modifier.background(colorResource(R.color.gray))
             .verticalScroll(rememberScrollState())
     ) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(R.string.movie_details),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+            },
+            backgroundColor = Color.White,
+            elevation = 0.dp,
+        )
         MovieDetailsLayout(
             movie = movie,
             onFavoriteClickListener = viewModel::onFavoriteClick

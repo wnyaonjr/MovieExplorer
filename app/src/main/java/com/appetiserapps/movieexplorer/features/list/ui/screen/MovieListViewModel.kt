@@ -30,8 +30,9 @@ class MovieListViewModel @Inject constructor(
     val navigateToMovieDetails: LiveData<Int> = _navigateToMovieDetails
 
     private var delayedSearchJob: Job? = null
+    private var searchJob: Job? = null
 
-    private val movieSearchResults = MutableLiveData<List<Int>>()
+    private val movieSearchResults = MutableLiveData<List<Int>?>()
 
     init {
         initSources()
@@ -66,25 +67,34 @@ class MovieListViewModel @Inject constructor(
         }
     }
 
-    fun onSearch(query: String) {
+    fun onTextChange(query: String) {
         trackName.value = query
 
-        delayedSearchJob?.cancel()
+        cancelOngoingJobs()
 
         if (query.isNotBlank()) {
             delayedSearchJob = viewModelScope.launch {
                 delay(TEXT_CHANGE_DEBOUNCE)
-                movieListUseCases.updateMoviesUseCase(query).onEach { wrapper ->
-                    //TODO display of loading, success, and error message
-
-                    if (wrapper is ResultWrapper.Success) {
-                        handleSuccessUpdateMovies(wrapper.value)
-                    }
-                }.launchIn(viewModelScope)
+                onSearch(query)
             }
         } else {
             movieSearchResults.value = null
         }
+    }
+
+    private fun cancelOngoingJobs() {
+        delayedSearchJob?.cancel()
+        searchJob?.cancel()
+    }
+
+    private fun onSearch(query: String) {
+        searchJob = movieListUseCases.updateMoviesUseCase(query).onEach { wrapper ->
+            //TODO display of loading, success, and error message
+
+            if (wrapper is ResultWrapper.Success) {
+                handleSuccessUpdateMovies(wrapper.value)
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun handleSuccessUpdateMovies(response: MovieListResponse) {

@@ -17,12 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -85,7 +87,7 @@ fun MovieListLayout(viewModel: MovieListViewModel) {
         trackName = trackName,
         onFavoriteClickListener = viewModel::onFavoriteClick,
         onMovieClickListener = viewModel::onMovieClick,
-        searchListener = viewModel::onSearch
+        searchListener = viewModel::onTextChange
     )
 }
 
@@ -101,6 +103,17 @@ fun MovieListLayout(
     var text by remember { mutableStateOf(TextFieldValue(trackName.orEmpty())) }
 
     Column(modifier = Modifier.background(colorResource(R.color.gray))) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(R.string.movies),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+            },
+            backgroundColor = Color.White,
+        )
+
         OutlinedTextField(
             value = text,
             singleLine = true,
@@ -109,11 +122,16 @@ fun MovieListLayout(
                 .padding(8.dp)
                 .fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            label = { Text(text = stringResource(R.string.movie_name)) },
+            placeholder = { Text(text = stringResource(R.string.movie_name)) },
             onValueChange = {
                 text = it
                 searchListener?.invoke(text.text)
-            }
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.White,
+                focusedIndicatorColor = colorResource(R.color.green),
+                unfocusedIndicatorColor = Color.Black
+            ),
         )
         MovieList(
             movies = movies,
