@@ -1,5 +1,3 @@
-# 09122022-winifredo-ya-on-jr-android
-
 ## Name
 Movie Explorer
 
